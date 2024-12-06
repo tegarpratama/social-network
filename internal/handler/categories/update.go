@@ -2,7 +2,6 @@ package categories
 
 import (
 	"net/http"
-	"social-network/internal/helper"
 	"social-network/internal/model/categories"
 	"strconv"
 
@@ -13,31 +12,31 @@ func (h *handler) UpdateCategory(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	categoryIDStr := c.Param("categoryID")
-	categoryID, err := strconv.ParseInt(categoryIDStr, 10, 64)
+	categoryID, err := strconv.Atoi(categoryIDStr)
 	if err != nil {
-		helper.SetResponse(c, http.StatusInternalServerError, &helper.Response{
-			Message: err.Error(),
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
 		})
 		return
 	}
 
-	var request categories.CreateUpdateCategoryReq
-	if err := c.ShouldBindJSON(&request); err != nil {
-		helper.SetResponse(c, http.StatusBadRequest, &helper.Response{
-			Message: err.Error(),
+	var req categories.CreateUpdateCategoryReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
 		})
 		return
 	}
 
-	errService := h.categorySvc.UpdateCategory(ctx, categoryID, &request)
-	if errService != nil {
-		helper.SetResponse(c, errService.Code, &helper.Response{
-			Message: errService.Message.Error(),
+	errCode, err := h.categorySvc.UpdateCategory(ctx, int64(categoryID), &req)
+	if err != nil {
+		c.JSON(errCode, gin.H{
+			"message": err.Error(),
 		})
 		return
 	}
 
-	helper.SetResponse(c, http.StatusOK, &helper.Response{
-		Message: "successfully updated category",
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "successfully updated category",
 	})
 }

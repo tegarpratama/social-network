@@ -3,21 +3,22 @@ package categories
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
-	"social-network/internal/helper"
 	"social-network/internal/model/categories"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
-func (s *service) UpdateCategory(ctx context.Context, categoryID int64, req *categories.CreateUpdateCategoryReq) *helper.Error {
-	data, err := s.categoryRepo.CategoryDetail(ctx, categoryID)
-	log.Println(data)
+func (s *service) UpdateCategory(ctx context.Context, categoryID int64, req *categories.CreateUpdateCategoryReq) (int, error) {
+	category, err := s.categoryRepo.CategoryDetail(ctx, categoryID)
 	if err != nil {
-		return &helper.Error{
-			Code:    http.StatusNotFound,
-			Message: errors.New("category not found"),
-		}
+		log.Error().Err(err).Msg("")
+		return http.StatusInternalServerError, err
+	}
+
+	if category == nil {
+		return http.StatusNotFound, errors.New("category not found")
 	}
 
 	now := time.Now()
@@ -28,11 +29,8 @@ func (s *service) UpdateCategory(ctx context.Context, categoryID int64, req *cat
 
 	err = s.categoryRepo.UpdateCategory(ctx, categoryID, model)
 	if err != nil {
-		return &helper.Error{
-			Code:    http.StatusInternalServerError,
-			Message: err,
-		}
+		return http.StatusInternalServerError, err
 	}
 
-	return nil
+	return 0, nil
 }

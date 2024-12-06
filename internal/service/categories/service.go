@@ -11,6 +11,8 @@ type categoryRepository interface {
 	SoftDeleteCategory(ctx context.Context, categoryID int64, now time.Time) error
 	CategoryDetail(ctx context.Context, categoryID int64) (*categories.CategoryObj, error)
 	UpdateCategory(ctx context.Context, categoryID int64, model categories.Category) error
+	ListCategory(ctx context.Context, limit, offset int) (*categories.ListCategoriesRes, error)
+	TotalCategory(ctx context.Context) (int, error)
 }
 
 type service struct {

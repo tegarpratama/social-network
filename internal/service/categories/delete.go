@@ -2,20 +2,29 @@ package categories
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"social-network/internal/helper"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
-func (s *service) DeleteCategory(ctx context.Context, categoryID int64) *helper.Error {
-	now := time.Now()
-	err := s.categoryRepo.SoftDeleteCategory(ctx, categoryID, now)
+func (s *service) DeleteCategory(ctx context.Context, categoryID int64) (int, error) {
+	category, err := s.categoryRepo.CategoryDetail(ctx, categoryID)
 	if err != nil {
-		return &helper.Error{
-			Code:    http.StatusInternalServerError,
-			Message: err,
-		}
+		log.Error().Err(err).Msg("")
+		return http.StatusInternalServerError, err
 	}
 
-	return nil
+	if category == nil {
+		return http.StatusNotFound, errors.New("category not found")
+	}
+
+	now := time.Now()
+	err = s.categoryRepo.SoftDeleteCategory(ctx, categoryID, now)
+	if err != nil {
+		log.Error().Err(err).Msg("")
+	}
+
+	return 0, err
 }

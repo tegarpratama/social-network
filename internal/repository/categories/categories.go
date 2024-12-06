@@ -12,8 +12,8 @@ func (r *repository) InsertCategory(ctx context.Context, model *categories.Categ
 	query := `
 		INSERT INTO categories (name, created_at, updated_at) 
 		VALUES (?, ?, ?)`
-
 	_, err := r.db.ExecContext(ctx, query, model.Name, model.CreatedAt, model.UpdatedAt)
+
 	return err
 }
 
@@ -56,9 +56,52 @@ func (r *repository) CategoryDetail(ctx context.Context, categoryID int64) (*cat
 func (r *repository) UpdateCategory(ctx context.Context, categoryID int64, model categories.Category) error {
 	query := `UPDATE categories SET name = ?, updated_at = ? WHERE id = ?`
 	_, err := r.db.ExecContext(ctx, query, model.Name, model.UpdatedAt, categoryID)
+
+	return err
+}
+
+func (r *repository) ListCategory(ctx context.Context, limit, offset int) (*categories.ListCategoriesRes, error) {
+	var listCategory categories.ListCategoriesRes
+	var data []categories.CategoryObj
+
+	query := `SELECT *
+		FROM categories 
+		WHERE deleted_at IS NULL
+		ORDER BY id DESC
+		LIMIT ? OFFSET ?`
+	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
-		return err
+		return &listCategory, err
 	}
 
-	return nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var categoryTemp categories.Category
+		err := rows.Scan(&categoryTemp.ID, &categoryTemp.Name, &categoryTemp.CreatedAt, &categoryTemp.UpdatedAt, &categoryTemp.DeletedAt)
+		if err != nil {
+			return &listCategory, err
+		}
+
+		data = append(data, categories.CategoryObj{
+			ID:        categoryTemp.ID,
+			Name:      categoryTemp.Name,
+			CreatedAt: categoryTemp.CreatedAt,
+			UpdatedAt: categoryTemp.UpdatedAt,
+		})
+	}
+
+	listCategory.Data = data
+
+	return &listCategory, nil
+}
+
+func (r *repository) TotalCategory(ctx context.Context) (int, error) {
+	total := 0
+
+	query := `SELECT COUNT(id) as total FROM categories WHERE deleted_at IS NULL`
+	row := r.db.QueryRowContext(ctx, query)
+	err := row.Scan(&total)
+
+	return total, err
 }
