@@ -40,7 +40,7 @@ func main() {
 
 	// Users API
 	userRepo := userRepo.NewRepository(db)
-	userService := userSvc.NewService(userRepo)
+	userService := userSvc.NewService(userRepo, cfg)
 	userHandler := userHandler.NewHandler(r, userService)
 	userHandler.RouteList()
 

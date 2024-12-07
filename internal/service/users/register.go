@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (s *service) Register(ctx context.Context, req users.UserRegister) (int, error) {
+func (s *service) Register(ctx context.Context, req users.UserRegisterReq) (int, error) {
 	exist, err := s.userRepo.UsernameExist(ctx, req.Username)
 	if err != nil {
 		log.Err(err).Msg("")
