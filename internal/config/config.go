@@ -10,7 +10,7 @@ const (
 	CONFIG_TYPE = "env"
 )
 
-var config ConfigTypes
+var config *ConfigTypes
 
 func SetupConfig() (*ConfigTypes, error) {
 	viper.AddConfigPath(CONFIG_PATH)
@@ -20,10 +20,18 @@ func SetupConfig() (*ConfigTypes, error) {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		return &config, err
+		return config, err
 	}
 
 	viper.Unmarshal(&config)
 
-	return &config, nil
+	return config, nil
+}
+
+func Get() *ConfigTypes {
+	if config == nil {
+		config = &ConfigTypes{}
+	}
+
+	return config
 }

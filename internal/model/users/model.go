@@ -32,6 +32,10 @@ type (
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
+
+	RefreshTokenReq struct {
+		RefreshToken string `json:"refresh_token"`
+	}
 )
 
 type (
@@ -40,5 +44,9 @@ type (
 		Username     string `json:"username"`
 		Token        string `json:"token"`
 		RefreshToken string `json:"refresh_token"`
+	}
+
+	RefreshTokenRes struct {
+		Token string `json:"token"`
 	}
 )

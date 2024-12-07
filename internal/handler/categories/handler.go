@@ -2,6 +2,7 @@ package categories
 
 import (
 	"context"
+	"social-network/internal/middleware"
 	"social-network/internal/model/categories"
 
 	"github.com/gin-gonic/gin"
@@ -29,9 +30,12 @@ func NewHandler(api *gin.Engine, categorySvc categoryService) *handler {
 
 func (h *handler) RouteList() {
 	route := h.api.Group("/categories")
-	route.GET("/", h.ListCategory)
-	route.POST("/", h.CreateCategory)
-	route.DELETE("/:categoryID", h.DeleteCtegory)
-	route.PUT("/:categoryID", h.UpdateCategory)
+	routeWithAuth := h.api.Group("/categories")
+	routeWithAuth.Use(middleware.AuthMiddleware())
+
+	routeWithAuth.GET("/", h.ListCategory)
+	routeWithAuth.POST("/", h.CreateCategory)
+	routeWithAuth.DELETE("/:categoryID", h.DeleteCtegory)
+	routeWithAuth.PUT("/:categoryID", h.UpdateCategory)
 	route.GET("/:categoryID", h.DetailCategory)
 }

@@ -24,3 +24,14 @@
    ```
    make migrate-down
    ```
+
+## Modules
+
+1. Authentication
+
+   - Register
+   - Login
+   - Refresh Token
+
+2. CRUD Categories
+3. CRUD Posts (WIP)

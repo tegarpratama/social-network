@@ -79,3 +79,27 @@ func (r *repository) InsertRefreshToken(ctx context.Context, model *users.Refres
 
 	return err
 }
+
+func (r *repository) GetUserByID(ctx context.Context, userID int64) (*users.User, error) {
+	query := `SELECT id, username, password, created_at, updated_at FROM users WHERE id = ? AND deleted_at IS NULL`
+	row := r.db.QueryRowContext(ctx, query, userID)
+
+	var user users.User
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *repository) DeleteRefreshToken(ctx context.Context, userID int64) error {
+	query := `DELETE FROM refresh_tokens WHERE user_id = ?`
+	_, err := r.db.ExecContext(ctx, query, userID)
+
+	return err
+}

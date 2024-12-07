@@ -13,6 +13,8 @@ type userRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (*users.User, error)
 	GetRefreshToken(ctx context.Context, userID int64, now time.Time) (*users.RefreshToken, error)
 	InsertRefreshToken(ctx context.Context, model *users.RefreshToken) error
+	GetUserByID(ctx context.Context, userID int64) (*users.User, error)
+	DeleteRefreshToken(ctx context.Context, userID int64) error
 }
 
 type service struct {

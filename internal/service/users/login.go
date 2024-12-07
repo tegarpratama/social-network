@@ -54,7 +54,7 @@ func (s *service) Login(ctx context.Context, req users.UserLoginReq) (*users.Use
 
 	if existingRefreshToken != nil {
 		result.RefreshToken = existingRefreshToken.RefreshToken
-		return result, 0, nil
+		return result, http.StatusOK, nil
 	}
 
 	// Generate refresh token
@@ -63,11 +63,19 @@ func (s *service) Login(ctx context.Context, req users.UserLoginReq) (*users.Use
 		return result, http.StatusInternalServerError, errors.New("failed to generate refresh token")
 	}
 
+	result.RefreshToken = refreshToken
+
+	err = s.userRepo.DeleteRefreshToken(ctx, user.ID)
+	if err != nil {
+		log.Error().Err(err).Msg("")
+		return nil, 0, err
+	}
+
 	now := time.Now()
 	err = s.userRepo.InsertRefreshToken(ctx, &users.RefreshToken{
 		UserID:       user.ID,
 		RefreshToken: refreshToken,
-		ExpiredAt:    time.Now().Add(10 * 24 * time.Hour),
+		ExpiredAt:    time.Now().Add(7 * 24 * time.Hour),
 		CreatedAt:    now,
 	})
 
