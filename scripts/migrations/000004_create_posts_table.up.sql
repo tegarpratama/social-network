@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS posts(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  content TEXT NOT NULL,
+  user_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL,
+  CONSTRAINT fK_user_id_posts FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT fK_category_id_posts FOREIGN KEY (category_id) REFERENCES categories(id)
+)

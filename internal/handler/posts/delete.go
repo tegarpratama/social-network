@@ -1,4 +1,4 @@
-package categories
+package posts
 
 import (
 	"net/http"
@@ -7,11 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *handler) DeleteCategory(c *gin.Context) {
+func (h *handler) DeletePost(c *gin.Context) {
 	ctx := c.Request.Context()
-	categoryIDStr := c.Param("categoryID")
-	categoryID, err := strconv.Atoi(categoryIDStr)
-
+	postIDStr := c.Param("postID")
+	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
@@ -19,7 +18,9 @@ func (h *handler) DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	errCode, err := h.categorySvc.DeleteCategory(ctx, int64(categoryID))
+	userID := c.GetInt64("userID")
+
+	errCode, err := h.postService.DeletePost(ctx, int64(postID), userID)
 	if err != nil {
 		c.JSON(errCode, gin.H{
 			"message": err.Error(),
@@ -28,6 +29,6 @@ func (h *handler) DeleteCategory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "successfully deleted category",
+		"message": "successfully deleted post",
 	})
 }

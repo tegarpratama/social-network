@@ -1,37 +1,38 @@
-package categories
+package posts
 
 import (
 	"context"
 	"math"
-	"social-network/internal/model/categories"
 	"social-network/internal/model/paginate"
+	"social-network/internal/model/posts"
 
 	"github.com/rs/zerolog/log"
 )
 
-func (s *service) ListCategory(ctx context.Context, limit, page int) (*categories.ListCategoriesRes, error) {
+func (s *service) ListPosts(ctx context.Context, limit, page int) (*posts.ListPostsRes, error) {
 	offset := (page - 1) * limit
-	listCategories, err := s.categoryRepo.ListCategory(ctx, limit, offset)
+	listPosts, err := s.postRepo.ListPosts(ctx, limit, offset)
 	if err != nil {
 		log.Error().Err(err).Msg("")
 		return nil, nil
 
 	}
-	total, err := s.categoryRepo.TotalCategory(ctx)
+
+	total, err := s.postRepo.TotalPosts(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("")
-		return nil, err
+		return nil, nil
 	}
 
 	totalPages := math.Ceil(float64(total) / float64(limit))
 
-	result := categories.ListCategoriesRes{
+	result := posts.ListPostsRes{
 		Paginate: paginate.Paginate{
 			Limit:       limit,
 			TotalPage:   int(totalPages),
 			CurrentPage: page,
 		},
-		Data: *listCategories,
+		Data: *listPosts,
 	}
 
 	return &result, nil

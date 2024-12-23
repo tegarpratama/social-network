@@ -33,9 +33,9 @@ func (h *handler) RouteList() {
 	routeWithAuth := h.api.Group("/categories")
 	routeWithAuth.Use(middleware.AuthMiddleware())
 
-	routeWithAuth.GET("/", h.ListCategory)
+	route.GET("/", h.ListCategory)
 	routeWithAuth.POST("/", h.CreateCategory)
-	routeWithAuth.DELETE("/:categoryID", h.DeleteCtegory)
+	routeWithAuth.DELETE("/:categoryID", h.DeleteCategory)
 	routeWithAuth.PUT("/:categoryID", h.UpdateCategory)
 	route.GET("/:categoryID", h.DetailCategory)
 }

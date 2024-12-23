@@ -34,4 +34,4 @@
    - Refresh Token
 
 2. CRUD Categories
-3. CRUD Posts (WIP)
+3. CRUD Posts 

@@ -1,14 +1,14 @@
-package categories
+package posts
 
 import (
 	"net/http"
-	"social-network/internal/model/categories"
+	"social-network/internal/model/posts"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (h *handler) ListCategory(c *gin.Context) {
+func (h *handler) ListPosts(c *gin.Context) {
 	ctx := c.Request.Context()
 	limitStr := c.Query("limit")
 	pageStr := c.Query("page")
@@ -23,7 +23,7 @@ func (h *handler) ListCategory(c *gin.Context) {
 		page = 1
 	}
 
-	result, err := h.categorySvc.ListCategory(ctx, limit, page)
+	result, err := h.postService.ListPosts(ctx, limit, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
@@ -33,11 +33,11 @@ func (h *handler) ListCategory(c *gin.Context) {
 
 	data := result.Data
 	if len(data) == 0 {
-		data = []categories.CategoryObj{}
+		data = []posts.PostObj{}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "list categories",
+		"message":  "list posts",
 		"paginate": result.Paginate,
 		"data":     data,
 	})

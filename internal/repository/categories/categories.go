@@ -60,27 +60,31 @@ func (r *repository) UpdateCategory(ctx context.Context, categoryID int64, model
 	return err
 }
 
-func (r *repository) ListCategory(ctx context.Context, limit, offset int) (*categories.ListCategoriesRes, error) {
-	var listCategory categories.ListCategoriesRes
-	var data []categories.CategoryObj
+func (r *repository) ListCategory(ctx context.Context, limit, offset int) (*[]categories.CategoryObj, error) {
 
-	query := `SELECT *
+	query := `SELECT id, name, created_at, updated_at
 		FROM categories 
 		WHERE deleted_at IS NULL
 		ORDER BY id DESC
 		LIMIT ? OFFSET ?`
+
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
-		return &listCategory, err
+		return nil, err
 	}
 
 	defer rows.Close()
 
+	var (
+		data []categories.CategoryObj
+	)
+
 	for rows.Next() {
-		var categoryTemp categories.Category
-		err := rows.Scan(&categoryTemp.ID, &categoryTemp.Name, &categoryTemp.CreatedAt, &categoryTemp.UpdatedAt, &categoryTemp.DeletedAt)
+		var categoryTemp categories.CategoryObj
+		err := rows.Scan(&categoryTemp.ID, &categoryTemp.Name, &categoryTemp.CreatedAt, &categoryTemp.UpdatedAt)
+
 		if err != nil {
-			return &listCategory, err
+			return nil, err
 		}
 
 		data = append(data, categories.CategoryObj{
@@ -91,9 +95,7 @@ func (r *repository) ListCategory(ctx context.Context, limit, offset int) (*cate
 		})
 	}
 
-	listCategory.Data = data
-
-	return &listCategory, nil
+	return &data, nil
 }
 
 func (r *repository) TotalCategory(ctx context.Context) (int, error) {

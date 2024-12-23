@@ -7,6 +7,11 @@ import (
 	categoryHandler "social-network/internal/handler/categories"
 	userHandler "social-network/internal/handler/users"
 	categoryRepo "social-network/internal/repository/categories"
+
+	postHandler "social-network/internal/handler/posts"
+	postRepo "social-network/internal/repository/posts"
+	postSvc "social-network/internal/service/posts"
+
 	userRepo "social-network/internal/repository/users"
 	categorySvc "social-network/internal/service/categories"
 	userSvc "social-network/internal/service/users"
@@ -43,6 +48,12 @@ func main() {
 	userService := userSvc.NewService(userRepo, cfg)
 	userHandler := userHandler.NewHandler(r, userService)
 	userHandler.RouteList()
+
+	// Posts API
+	postRepo := postRepo.NewRepository(db)
+	postService := postSvc.NewService(postRepo)
+	postHandler := postHandler.NewHandler(r, postService)
+	postHandler.RouteList()
 
 	server := fmt.Sprintf("127.0.0.1:%s", cfg.PORT)
 	r.Run(server)
